@@ -4,7 +4,6 @@ import random
 
 from PySide6 import QtWidgets, QtCore, QtGui
 
-
 def create_cube(self, name, position, dimensions, rotation=(0, 0, 0)):
 
     obj = cmds.polyCube(name=name, width=dimensions[0], height=dimensions[1], depth=dimensions[2])[0]
@@ -16,6 +15,13 @@ def create_cube(self, name, position, dimensions, rotation=(0, 0, 0)):
     return obj
 
 
+class ProceduralCubeMan:
+
+    GROUP = "ProceduralCubeMan_GRP"
+
+    def __init__(self):
+
+        self.material = None
 
 
 def create_torso(self, hip_y, torso_length, torso_width):
