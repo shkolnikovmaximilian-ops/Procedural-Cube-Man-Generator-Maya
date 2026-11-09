@@ -41,3 +41,55 @@ def create_neck(self, torso_top, torso_width, head_width):
     self.create_cube("Neck", (0, neck_center, 0), (neck_width, neck_height, neck_depth))
 
     return torso_top + neck_height
+
+def create_arms(self, torso_top, torso_width, arm_length, limb_width, hand_gap):
+
+    shoulder_y = (torso_top - torso_width * 0.12)
+    shoulder_offset = (torso_width * 0.48)
+        
+    arm_angle = math.radians(45)
+    segment_length = arm_length / 2.0
+    horizontal = (math.cos(arm_angle) * segment_length)
+    vertical = (math.sin(arm_angle) * segment_length)
+    arm_depth = limb_width * 0.9
+    
+    hand_size = limb_width * 1.15
+
+    for side in [-1, 1]:
+        
+        side_name = ("Left" if side == -1 else "Right")
+
+        shoulder = (side * shoulder_offset, shoulder_y, 0)
+
+        elbow = (side * (shoulder_offset + horizontal), shoulder_y - vertical, 0)
+
+        wrist = (side * (shoulder_offset + horizontal * 2), shoulder_y - vertical * 2, 0)
+
+    # Upper arm
+
+    self.create_segment(side_name + "_Upper_Arm", shoulder, elbow, limb_width, arm_depth)
+
+    # Lower arm
+
+    self.create_segment(side_name + "_Lower_Arm", elbow, wrist, limb_width * 0.9, arm_depth)
+
+    direction_x = (side * math.cos(arm_angle))
+    direction_y = (-math.sin(arm_angle))
+
+    hand_offset = (hand_gap + hand_size * 0.5)
+
+    hand_position = (wrist[0] + direction_x * hand_offset, wrist[1] + direction_y * hand_offset, 0)
+
+    hand_rotation = (0, 0, -side * 45)
+
+    self.create_cube(side_name + "_Hand", hand_position, (hand_size, hand_size, hand_size * 0.8), hand_rotation)
+
+def create_head(self, neck_top, head_width):
+
+    head_height = head_width * 1.12
+
+    head_depth = head_width * 0.75
+
+    head_center_y = (neck_top + head_height / 2.0)
+
+    self.create_cube("Head", (0, head_center_y, 0), (head_width, head_height, head_depth))
