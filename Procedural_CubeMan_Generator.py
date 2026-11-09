@@ -144,36 +144,93 @@ def create_legs(self, hip_y, leg_length, torso_width, limb_width, foot_gap):
     
     
     
-    def create_segment(self, name, start, end, width, depth):
+def create_segment(self, name, start, end, width, depth):
 
-        start = tuple(start)
-        end = tuple(end)
+    start = tuple(start)
+    end = tuple(end)
 
-        dx = end[0] - start[0]
-        dy = end[1] - start[1]
-        dz = end[2] - start[2]
+    dx = end[0] - start[0]
+    dy = end[1] - start[1]
+    dz = end[2] - start[2]
 
-        length = math.sqrt(dx * dx + dy * dy + dz * dz)
-        midpoint = ((start[0] + end[0]) / 2.0, (start[1] + end[1]) / 2.0, (start[2] + end[2]) / 2.0)
-        angle = math.degrees(math.atan2(-dx, dy))
+    length = math.sqrt(dx * dx + dy * dy + dz * dz)
+    midpoint = ((start[0] + end[0]) / 2.0, (start[1] + end[1]) / 2.0, (start[2] + end[2]) / 2.0)
+    angle = math.degrees(math.atan2(-dx, dy))
 
-        return self.create_cube(name, midpoint, (width, length, depth), rotation=(0, 0, angle))
-
-
+    return self.create_cube(name, midpoint, (width, length, depth), rotation=(0, 0, angle))
 
 
-    def create_material(self, color):
 
-        material_name = "CubeMan_Material"
 
-        if cmds.objExists(material_name):
+def create_material(self, color):
+
+    material_name = "CubeMan_Material"
+
+    if cmds.objExists(material_name):
             
-            cmds.delete(material_name)
+        cmds.delete(material_name)
 
-        self.material = cmds.shadingNode("lambert", asShader=True, name=material_name)
+    self.material = cmds.shadingNode("lambert", asShader=True, name=material_name)
 
-        cmds.setAttr(self.material + ".color", color[0], color[1], color[2], type="double3")
-        shading_group = cmds.sets(renderable=True, noSurfaceShader=True, empty=True, name=material_name + "SG")
-        cmds.connectAttr(self.material + ".outColor", shading_group + ".surfaceShader", force=True)
+    cmds.setAttr(self.material + ".color", color[0], color[1], color[2], type="double3")
+    shading_group = cmds.sets(renderable=True, noSurfaceShader=True, empty=True, name=material_name + "SG")
+    cmds.connectAttr(self.material + ".outColor", shading_group + ".surfaceShader", force=True)
 
-        self.shading_group = shading_group
+    self.shading_group = shading_group
+
+
+
+
+def generate(self, arm_length, leg_length, torso_length, limb_width, torso_width, head_width, hand_gap, foot_gap, color):
+
+    if cmds.objExists(self.GROUP):
+
+        cmds.delete(self.GROUP)
+
+
+    cmds.group(empty=True, name=self.GROUP)
+
+    self.create_material(color)    
+
+    foot_height = limb_width * 0.5
+    
+    ankle_y = (foot_height + foot_gap)
+    
+    hip_y = (ankle_y + leg_length)
+
+    torso_top = self.create_torso(hip_y, torso_length, torso_width)
+
+    neck_top = self.create_neck(torso_top, torso_width, head_width)
+
+
+    self.create_head(neck_top, head_width)
+
+    self.create_arms(torso_top, torso_width, arm_length, limb_width, hand_gap)
+
+    self.create_legs(hip_y, leg_length, torso_width, limb_width, foot_gap)
+
+    cmds.select(self.GROUP, replace=True)
+
+        
+
+    cmds.viewFit(all=True)
+
+    class CubeManGeneratorUI(QtWidgets.QDialog):
+
+        WINDOW_TITLE = "Procedural CubeMan Generator"
+
+    def __init__(self, parent=None):
+
+        super(CubeManGeneratorUI, self).__init__(parent)
+
+        self.generator = ProceduralCubeMan()
+
+        self.character_color = QtGui.QColor(166, 166, 166)
+
+        self.setWindowTitle(self.WINDOW_TITLE)
+
+        self.setMinimumWidth(390)
+
+        self.setWindowFlags(self.windowFlags() | QtCore.Qt.Window)
+
+        self.build_ui()
