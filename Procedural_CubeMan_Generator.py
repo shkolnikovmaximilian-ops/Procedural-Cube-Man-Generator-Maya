@@ -311,7 +311,202 @@ def build_ui(self):
 
     main_layout.addWidget(scroll)
 
+    length_layout = self.create_section("Length Section", content_layout)
+
+    self.arm_slider = self.create_slider(length_layout, "Arms Length", 1.0, 8.0, 3.0)
+    self.leg_slider = self.create_slider(length_layout, "Legs Length", 2.0, 10.0, 5.0)
+    self.torso_slider = self.create_slider(length_layout, "Torso Length", 2.0, 6.0, 4.0)
+
+    width_layout = self.create_section("Width Section", content_layout)
+
+    self.limb_width_slider = self.create_slider(width_layout, "Limb Width", 0.2, 0.9, 0.4)
+    self.torso_width_slider = self.create_slider(width_layout, "Torso Width", 0.8, 3.0, 1.5)
+    self.head_width_slider = self.create_slider(width_layout, "Head Width", 0.6, 2.0, 1.0)
+
+    separation_layout = self.create_section("Appendage Seperation", content_layout)
+
+    self.hand_gap_slider = self.create_slider(separation_layout, "Hand", 0.0, 0.5, 0.12)
+    self.foot_gap_slider = self.create_slider(separation_layout, "Foot", 0.0, 0.5, 0.12)
+
+    color_layout = self.create_section("CubeMan Color", content_layout)
+        
+    color_row = QtWidgets.QHBoxLayout()
+    color_label = QtWidgets.QLabel("Mesh Color")
+
+    self.color_button = QtWidgets.QPushButton()
+    self.color_button.setFixedHeight(32)
+    self.update_color_button()
+    self.color_button.clicked.connect(self.choose_color)
+
+    color_row.addWidget(color_label)
+    color_row.addWidget(self.color_button)
+    color_layout.addLayout(color_row)
+
+    button_layout = QtWidgets.QVBoxLayout()
+
+    button_layout.setSpacing(8)
+
+    self.generate_button = QtWidgets.QPushButton("Generate Mesh")
+    self.generate_button.setMinimumHeight(20)
+    self.generate_button.clicked.connect(self.generate_character)
+    self.random_button = QtWidgets.QPushButton("Randomize Settings")
+    self.random_button.setMinimumHeight(20)
+    self.random_button.clicked.connect(self.random_character)
+    self.clear_button = QtWidgets.QPushButton("Delete Mesh")
+    self.clear_button.setMinimumHeight(20)
+    self.clear_button.clicked.connect(self.clear_character)
+
+    button_layout.addWidget(self.generate_button)
+    button_layout.addWidget(self.random_button)
+
+    button_layout.addWidget(self.clear_button)
+
+    main_layout.addLayout(button_layout)
+
+    self.status_label = QtWidgets.QLabel("Generate a Mesh")
+    self.status_label.setAlignment(QtCore.Qt.AlignCenter)
+
+    main_layout.addWidget(self.status_label)
 
 
 
+
+def update_color_button(self):
+
+    color = self.character_color
+
+    self.color_button.setStyleSheet("""QPushButton {background-color: %s; border: 1px solid #555555;  border-radius: 4px;}""" % color.name())
+
+
+
+def choose_color(self):
+
+    color = QtWidgets.QColorDialog.getColor(self.character_color, self, "Choose Character Color")
+
+    if color.isValid():
+
+        self.character_color = color
+        self.update_color_button()
+
+
+
+def get_color(self):
+
+    color = self.character_color
+
+    return (color.redF(), color.greenF(), color.blueF())
+
+
+
+def get_values(self):
+
+        return {
+            "arm_length": self.arm_slider.value(),
+            "leg_length": self.leg_slider.value(),
+            "torso_length": self.torso_slider.value(),
+            "limb_width": self.limb_width_slider.value(),
+            "torso_width": self.torso_width_slider.value(),
+            "head_width": self.head_width_slider.value(),
+            "hand_gap": self.hand_gap_slider.value(),
+            "foot_gap": self.foot_gap_slider.value()
+        }
+
+
+
+
+def generate_character(self):
+
+    try:
+
+        values = self.get_values()
+        color = self.get_color()
+
+        self.generator.generate(
+
+            arm_length=values["arm_length"],
+            leg_length=values["leg_length"],
+            torso_length=values["torso_length"],
+            limb_width=values["limb_width"],
+            torso_width=values["torso_width"],
+            head_width=values["head_width"],
+            hand_gap=values["hand_gap"],
+            foot_gap=values["foot_gap"],
+            color=color
+        )
+
+        self.status_label.setText("Cube Man Generated")
+
+    except Exception as error:
+
+        cmds.warning("Generation failed: {}".format(error))
+
+        self.status_label.setText("Generation failed")
+
+
+
+def random_character(self):
+
+        random_ranges = {
+            self.arm_slider: (2.0, 7.0),
+            self.leg_slider: (3.0, 10.0),
+            self.torso_slider: (2.0, 6.0),
+            self.limb_width_slider: (0.2, 0.9),
+            self.torso_width_slider: (0.8, 3.0),
+            self.head_width_slider: (0.6, 2.0),
+            self.hand_gap_slider: (0.05, 0.35),
+            self.foot_gap_slider: (0.05, 0.35)
+        }
+
+        for slider, limits in random_ranges.items():
+
+            value = random.uniform(limits[0], limits[1])
+            slider.setValue(value)
+
+        self.character_color = QtGui.QColor(random.randint(40, 255), random.randint(40, 255), random.randint(40, 255))
+        self.update_color_button()
+        self.generate_character()
+
+
+
+
+
+def clear_character(self):
+        
+        if cmds.objExists(self.generator.GROUP):
+
+            cmds.delete(self.generator.GROUP)
+
+        if cmds.objExists("ProceduralCubeMan_COL"):
+
+            cmds.delete("ProceduralCubeMan_COL")
+
+        if cmds.objExists("ProceduralCubeMan_COLSG"):
+
+            cmds.delete("ProceduralCubeMan_COLSG")
+
+        self.status_label.setText("Character cleared")
+
+
+
+
+def show_CubeMan_generator():
+
+    global CubeMan_generator_window
+
+    try:
+
+        CubeMan_generator_window.close()
+        CubeMan_generator_window.deleteLater()
+
+    except:
+
+        pass
+
+    CubeMan_generator_window = CubeManGeneratorUI()
+    CubeMan_generator_window.show()
+    CubeMan_generator_window.raise_()
+    CubeMan_generator_window.activateWindow()
+
+
+show_CubeMan_generator()
 
