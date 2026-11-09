@@ -30,3 +30,14 @@ def create_torso(self, hip_y, torso_length, torso_width):
         self.create_cube("Torso_Segment_{}".format(i + 1), (0, segment_y, 0), (torso_width, segment_height - seam_gap, torso_depth))
 
         return hip_y + torso_length
+
+def create_neck(self, torso_top, torso_width, head_width):
+
+    neck_height = head_width * 0.35
+    neck_width = head_width * 0.38
+    neck_depth = neck_width * 0.85
+    neck_center = (torso_top + neck_height / 2.0)
+
+    self.create_cube("Neck", (0, neck_center, 0), (neck_width, neck_height, neck_depth))
+
+    return torso_top + neck_height
