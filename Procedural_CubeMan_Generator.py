@@ -209,9 +209,7 @@ def generate(self, arm_length, leg_length, torso_length, limb_width, torso_width
 
     self.create_legs(hip_y, leg_length, torso_width, limb_width, foot_gap)
 
-    cmds.select(self.GROUP, replace=True)
-
-        
+    cmds.select(self.GROUP, replace=True)  
 
     cmds.viewFit(all=True)
 
@@ -219,18 +217,101 @@ def generate(self, arm_length, leg_length, torso_length, limb_width, torso_width
 
         WINDOW_TITLE = "Procedural CubeMan Generator"
 
-    def __init__(self, parent=None):
+    
+    
+    
+def __init__(self, parent=None):
 
-        super(CubeManGeneratorUI, self).__init__(parent)
+    super(CubeManGeneratorUI, self).__init__(parent)
 
-        self.generator = ProceduralCubeMan()
+    self.generator = ProceduralCubeMan()
 
-        self.character_color = QtGui.QColor(166, 166, 166)
+    self.character_color = QtGui.QColor(166, 166, 166)
 
-        self.setWindowTitle(self.WINDOW_TITLE)
+    self.setWindowTitle(self.WINDOW_TITLE)
 
-        self.setMinimumWidth(390)
+    self.setMinimumWidth(390)
 
-        self.setWindowFlags(self.windowFlags() | QtCore.Qt.Window)
+    self.setWindowFlags(self.windowFlags() | QtCore.Qt.Window)
 
-        self.build_ui()
+    self.build_ui()
+
+
+
+
+def create_slider(self, layout, label, minimum, maximum, default, decimals=2):
+
+    container = QtWidgets.QWidget()
+    container_layout = QtWidgets.QVBoxLayout(container)
+    container_layout.setContentsMargins(0, 2, 0, 2)
+    header = QtWidgets.QHBoxLayout()
+    text_label = QtWidgets.QLabel(label)
+    value_field = QtWidgets.QDoubleSpinBox()
+    value_field.setDecimals(decimals)
+    value_field.setRange(minimum, maximum)
+    value_field.setSingleStep(0.1)
+    value_field.setValue(default)
+    value_field.setFixedWidth(85)
+
+    slider = QtWidgets.QSlider(QtCore.Qt.Horizontal)
+
+    scale = 100
+
+    slider.setRange(int(minimum * scale), int(maximum * scale))
+        
+    slider.setValue(int(default * scale))
+
+    slider.valueChanged.connect(lambda value: value_field.setValue(value / scale))
+
+    value_field.valueChanged.connect(lambda value: slider.setValue(int(round(value * scale))))
+    header.addWidget(text_label)
+    header.addStretch()
+    header.addWidget(value_field)
+    container_layout.addLayout(header)
+    container_layout.addWidget(slider)
+    layout.addWidget(container)
+    return value_field
+
+
+
+def create_section(self, title, parent_layout):
+
+    group = QtWidgets.QGroupBox(title)
+    layout = QtWidgets.QVBoxLayout(group)
+    layout.setSpacing(6)
+    parent_layout.addWidget(group)
+
+    return layout
+
+
+
+
+def build_ui(self):
+        
+    main_layout = QtWidgets.QVBoxLayout(self)
+
+    main_layout.setContentsMargins(14, 14, 14, 14)
+
+    main_layout.setSpacing(10)
+
+    title = QtWidgets.QLabel("Procedural CubeMan Generator")
+    title.setAlignment(QtCore.Qt.AlignCenter)
+    title.setStyleSheet(""" font-size: 18px; font-weight: bold; padding: 8px; """)
+    main_layout.addWidget(title)
+
+    scroll = QtWidgets.QScrollArea()
+    scroll.setWidgetResizable(True)
+
+    scroll.setFrameShape(QtWidgets.QFrame.NoFrame)
+
+    content = QtWidgets.QWidget()
+    content_layout = QtWidgets.QVBoxLayout(content)
+    content_layout.setSpacing(12)
+    scroll.setWidget(content)
+
+    main_layout.addWidget(scroll)
+
+
+
+
+
