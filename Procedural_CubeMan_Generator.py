@@ -4,7 +4,6 @@ import random
 
 from PySide6 import QtWidgets, QtCore, QtGui
 
-### Making the Geometry ###
 
 def create_cube(self, name, position, dimensions, rotation=(0, 0, 0)):
 
@@ -15,6 +14,9 @@ def create_cube(self, name, position, dimensions, rotation=(0, 0, 0)):
     cmds.sets( obj, edit=True, forceElement=self.shading_group)
 
     return obj
+
+
+
 
 def create_torso(self, hip_y, torso_length, torso_width):
 
@@ -31,6 +33,9 @@ def create_torso(self, hip_y, torso_length, torso_width):
 
         return hip_y + torso_length
 
+
+
+
 def create_neck(self, torso_top, torso_width, head_width):
 
     neck_height = head_width * 0.35
@@ -41,6 +46,10 @@ def create_neck(self, torso_top, torso_width, head_width):
     self.create_cube("Neck", (0, neck_center, 0), (neck_width, neck_height, neck_depth))
 
     return torso_top + neck_height
+
+
+
+
 
 def create_arms(self, torso_top, torso_width, arm_length, limb_width, hand_gap):
 
@@ -65,11 +74,11 @@ def create_arms(self, torso_top, torso_width, arm_length, limb_width, hand_gap):
 
         wrist = (side * (shoulder_offset + horizontal * 2), shoulder_y - vertical * 2, 0)
 
-    # Upper arm
+
 
     self.create_segment(side_name + "_Upper_Arm", shoulder, elbow, limb_width, arm_depth)
 
-    # Lower arm
+    
 
     self.create_segment(side_name + "_Lower_Arm", elbow, wrist, limb_width * 0.9, arm_depth)
 
@@ -84,12 +93,50 @@ def create_arms(self, torso_top, torso_width, arm_length, limb_width, hand_gap):
 
     self.create_cube(side_name + "_Hand", hand_position, (hand_size, hand_size, hand_size * 0.8), hand_rotation)
 
+
+
+
+
 def create_head(self, neck_top, head_width):
 
     head_height = head_width * 1.12
-
     head_depth = head_width * 0.75
-
     head_center_y = (neck_top + head_height / 2.0)
-
+    
     self.create_cube("Head", (0, head_center_y, 0), (head_width, head_height, head_depth))
+
+
+
+def create_legs(self, hip_y, leg_length, torso_width, limb_width, foot_gap):
+
+    spacing = torso_width * 0.22
+    
+    foot_height = limb_width * 0.5
+    foot_width = limb_width * 1.2
+    foot_depth = limb_width * 1.8
+    
+    ankle_y = foot_height + foot_gap
+    
+    knee_y = (hip_y + ankle_y) / 2.0
+
+    leg_depth = limb_width * 0.9
+
+    for side in [-1, 1]:
+
+        side_name = ("Left" if side == -1 else "Right")
+
+        x = side * spacing
+
+        hip = (x, hip_y, 0)
+        
+        knee = (x, knee_y, 0)
+
+        ankle = (x, ankle_y, 0)
+
+    self.create_segment(side_name + "_Upper_Leg", hip, knee, limb_width, leg_depth)
+
+
+    self.create_segment(side_name + "_Lower_Leg", knee, ankle, limb_width, leg_depth)
+
+
+    self.create_cube(side_name + "_Foot", (x, foot_height / 2.0, limb_width * 0.45), (foot_width, foot_height, foot_depth))
