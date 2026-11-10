@@ -25,6 +25,22 @@ class ProceduralCubeMan:
         return obj
 
 
+    def create_segment(self, name, start, end, width, depth):
+
+        start = tuple(start)
+        end = tuple(end)
+
+        dx = end[0] - start[0]
+        dy = end[1] - start[1]
+        dz = end[2] - start[2]
+
+        length = math.sqrt(dx * dx + dy * dy + dz * dz)
+        midpoint = ((start[0] + end[0]) / 2.0, (start[1] + end[1]) / 2.0, (start[2] + end[2]) / 2.0)
+        angle = math.degrees(math.atan2(-dx, dy))
+
+        return self.create_cube(name, midpoint, (width, length, depth), rotation=(0, 0, angle))
+
+
     def create_torso(self, hip_y, torso_length, torso_width):
 
      segment_count = 4
@@ -32,13 +48,13 @@ class ProceduralCubeMan:
      torso_depth = torso_width * 0.42
      seam_gap = 0.025
 
-     for i in range(segment_count):
+     for i in range(4):
 
         segment_y = (hip_y +segment_height * i + segment_height / 2.0)
 
         self.create_cube("Torso_Segment_{}".format(i + 1), (0, segment_y, 0), (torso_width, segment_height - seam_gap, torso_depth))
 
-        return hip_y + torso_length
+     return hip_y + torso_length
 
 
 
@@ -83,22 +99,22 @@ class ProceduralCubeMan:
 
 
 
-        self.create_segment(side_name + "_Upper_Arm", shoulder, elbow, limb_width, arm_depth)
+            self.create_segment(side_name + "_Upper_Arm", shoulder, elbow, limb_width, arm_depth)
 
-    
+        
 
-        self.create_segment(side_name + "_Lower_Arm", elbow, wrist, limb_width * 0.9, arm_depth)
+            self.create_segment(side_name + "_Lower_Arm", elbow, wrist, limb_width * 0.9, arm_depth)
 
-        direction_x = (side * math.cos(arm_angle))
-        direction_y = (-math.sin(arm_angle))
+            direction_x = (side * math.cos(arm_angle))
+            direction_y = (-math.sin(arm_angle))
 
-        hand_offset = (hand_gap + hand_size * 0.5)
+            hand_offset = (hand_gap + hand_size * 0.5)
 
-        hand_position = (wrist[0] + direction_x * hand_offset, wrist[1] + direction_y * hand_offset, 0)
+            hand_position = (wrist[0] + direction_x * hand_offset, wrist[1] + direction_y * hand_offset, 0)
 
-        hand_rotation = (0, 0, -side * 45)
+            hand_rotation = (0, 0, -side * 45)
 
-        self.create_cube(side_name + "_Hand", hand_position, (hand_size, hand_size, hand_size * 0.8), hand_rotation)
+            self.create_cube(side_name + "_Hand", hand_position, (hand_size, hand_size, hand_size * 0.8), hand_rotation)
 
 
 
@@ -140,31 +156,13 @@ class ProceduralCubeMan:
 
             ankle = (x, ankle_y, 0)
 
-        self.create_segment(side_name + "_Upper_Leg", hip, knee, limb_width, leg_depth)
+            self.create_segment(side_name + "_Upper_Leg", hip, knee, limb_width, leg_depth)
 
 
-        self.create_segment(side_name + "_Lower_Leg", knee, ankle, limb_width, leg_depth)
+            self.create_segment(side_name + "_Lower_Leg", knee, ankle, limb_width, leg_depth)
 
 
-        self.create_cube(side_name + "_Foot", (x, foot_height / 2.0, limb_width * 0.45), (foot_width, foot_height, foot_depth))
-
-    
-    
-    
-    def create_segment(self, name, start, end, width, depth):
-
-        start = tuple(start)
-        end = tuple(end)
-
-        dx = end[0] - start[0]
-        dy = end[1] - start[1]
-        dz = end[2] - start[2]
-
-        length = math.sqrt(dx * dx + dy * dy + dz * dz)
-        midpoint = ((start[0] + end[0]) / 2.0, (start[1] + end[1]) / 2.0, (start[2] + end[2]) / 2.0)
-        angle = math.degrees(math.atan2(-dx, dy))
-
-        return self.create_cube(name, midpoint, (width, length, depth), rotation=(0, 0, angle))
+            self.create_cube(side_name + "_Foot", (x, foot_height / 2.0, limb_width * 0.45), (foot_width, foot_height, foot_depth))
 
 
 
